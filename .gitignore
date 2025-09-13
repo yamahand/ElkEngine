@@ -1,0 +1,274 @@
+﻿# ElkGameEngine .gitignore
+
+# ========================================
+# Build Output
+# ========================================
+
+# CMake build directories
+build/
+out/
+cmake-build-*/
+
+# Generated binaries
+bin/
+lib/
+Binaries/
+Intermediate/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+
+# ========================================
+# IDE Files
+# ========================================
+
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# CLion
+.idea/
+cmake-build-*/
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.autosave
+
+# ========================================
+# Compiler / Platform Specific
+# ========================================
+
+# Windows
+*.exe
+*.dll
+*.pdb
+*.ilk
+*.obj
+*.tlog
+*.idb
+*.ipdb
+*.iobj
+*.res
+*.rc.h
+Thumbs.db
+Desktop.ini
+
+# Linux
+*.so
+*.a
+*.o
+core
+
+# macOS
+*.dylib
+*.dSYM/
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# ========================================
+# Language Specific
+# ========================================
+
+# C/C++
+*.obj
+*.o
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# ========================================
+# Logs and Temporary Files
+# ========================================
+
+# Log files
+*.log
+*.tlog
+logs/
+Log/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# Crash dumps
+*.dmp
+*.mdmp
+crash-*.txt
+
+# ========================================
+# Package Managers
+# ========================================
+
+# Conan
+conandata.yml
+conanfile.txt
+conaninfo.txt
+conanbuildinfo.*
+conan.lock
+
+# vcpkg
+vcpkg_installed/
+.vcpkg-root
+
+# ========================================
+# Game Engine Specific
+# ========================================
+
+# Asset cache and generated files
+AssetCache/
+Cache/
+*.cache
+
+# Shader compiled output
+Shaders/Compiled/
+*.cso
+*.spv
+
+# Game save files and user data
+Save/
+UserData/
+Config/UserSettings.ini
+
+# ========================================
+# Third Party
+# ========================================
+
+# Downloaded dependencies (if not using FetchContent)
+ThirdParty/*/
+!ThirdParty/CMakeLists.txt
+!ThirdParty/README.md
+
+# Exclude specific third party if manually placed
+!ThirdParty/DirectXTK/
+!ThirdParty/FMOD/
+# But ignore their build outputs
+ThirdParty/**/build/
+ThirdParty/**/bin/
+ThirdParty/**/lib/
+
+# ========================================
+# Documentation
+# ========================================
+
+# Generated documentation
+docs/html/
+docs/latex/
+docs/xml/
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
+# ========================================
+# Testing
+# ========================================
+
+# Test results
+TestResults/
+*.xml
+*.trx
+
+# Coverage reports
+coverage/
+*.gcov
+*.gcda
+*.gcno
+
+# ========================================
+# Miscellaneous
+# ========================================
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Backup files
+*.backup
+*_backup
+
+# Editor temp files
+*~
+*.orig
+*.rej
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# ========================================
+# Project Specific
+# ========================================
+
+# Custom build configurations
+local_config.cmake
+
+# Asset working directories
+Assets/Working/
+Assets/Raw/
+
+# Generated config files
+Config/Generated/
