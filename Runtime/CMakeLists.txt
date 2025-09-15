@@ -8,6 +8,19 @@ message(STATUS "Configuring Runtime...")
 
 elk_add_source_directory_recursive(RUNTIME_SOURCES "Source")
 
+# Visual Studio のフィルターを Runtime ディレクトリ基準の相対パスにする
+if(MSVC)
+    foreach(_src IN LISTS RUNTIME_SOURCES)
+        file(RELATIVE_PATH _rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_src}")
+        get_filename_component(_dir "${_rel}" PATH)
+        if(_dir STREQUAL "")
+            set(_dir "Source")
+        endif()
+        string(REPLACE "/" "\\" _group "${_dir}")
+        source_group("${_group}" FILES "${_src}")
+    endforeach()
+endif()
+
 # ========================================
 # 実行ファイル作成
 # ========================================
