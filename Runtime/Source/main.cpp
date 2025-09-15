@@ -1,9 +1,11 @@
-#include "ElkEngine/Core/Engine.h"
+﻿#include "ElkEngine/Core/Engine.h"
 #include "GameApplication.h"
+
+#include <memory>
 
 int main() {
     // Create engine
-    auto* engine = ElkEngine::CreateEngine();
+    auto* engine = elk::CreateEngine();
     if (!engine) {
         return -1;
     }
@@ -15,6 +17,6 @@ int main() {
     engine->Run(game.get());
 
     // Cleanup
-    ElkEngine::DestroyEngine(engine);
+    elk::DestroyEngine(engine);
     return 0;
 }

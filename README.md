@@ -133,7 +133,7 @@ cmake --build . --config Release
 ```cpp
 #include "ElkEngine/ElkEngine.h"
 
-class MyGame : public ElkEngine::Application {
+class MyGame : public elk::Application {
 public:
     bool Initialize() override {
         // Initialize your game
@@ -150,12 +150,12 @@ public:
 };
 
 int main() {
-    auto engine = ElkEngine::CreateEngine();
+    auto engine = elk::CreateEngine();
     auto game = std::make_unique<MyGame>();
     
     engine->Run(game.get());
     
-    ElkEngine::DestroyEngine(engine);
+    elk::DestroyEngine(engine);
     return 0;
 }
 ```

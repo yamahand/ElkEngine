@@ -2,7 +2,7 @@
 
 #include "ElkEngine/Core/Application.h"
 
-class GameApplication : public ElkEngine::Application {
+class GameApplication : public elk::Application {
 public:
     GameApplication() = default;
     ~GameApplication() override = default;

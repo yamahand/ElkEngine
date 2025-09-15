@@ -5,7 +5,7 @@ REM Usage: generate.bat [clean|vs2019|vs2022|help]
 setlocal
 
 REM ========================================
-REM İ’è
+REM ï¿½İ’ï¿½
 REM ========================================
 
 set PROJECT_NAME=ElkGameEngine
@@ -14,7 +14,7 @@ set DEFAULT_GENERATOR="Visual Studio 17 2022"
 set ARCHITECTURE=x64
 
 REM ========================================
-REM ˆø”ˆ—
+REM ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 REM ========================================
 
 set GENERATOR=%DEFAULT_GENERATOR%
@@ -61,7 +61,7 @@ goto end
 :generate
 
 REM ========================================
-REM ƒvƒƒWƒFƒNƒg¶¬ŠJn
+REM ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½n
 REM ========================================
 
 echo.
@@ -74,7 +74,7 @@ echo  Clean Build: %CLEAN_BUILD%
 echo =========================================
 echo.
 
-REM CMakeƒo[ƒWƒ‡ƒ“Šm”F
+REM CMakeï¿½oï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½mï¿½F
 cmake --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo ? CMake is not installed or not in PATH!
@@ -88,7 +88,7 @@ if %errorlevel% neq 0 (
 
 echo ? CMake found
 
-REM Visual StudioƒCƒ“ƒXƒg[ƒ‹Šm”F
+REM Visual Studioï¿½Cï¿½ï¿½ï¿½Xï¿½gï¿½[ï¿½ï¿½ï¿½mï¿½F
 if %GENERATOR%=="Visual Studio 17 2022" (
     where devenv >nul 2>&1
     if %errorlevel% neq 0 (
@@ -103,7 +103,7 @@ if %GENERATOR%=="Visual Studio 17 2022" (
 
 echo.
 
-REM ƒNƒŠ[ƒ“ƒrƒ‹ƒh
+REM ï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½rï¿½ï¿½ï¿½h
 if "%CLEAN_BUILD%"=="true" (
     echo ? Cleaning build directory...
     if exist %BUILD_DIR% (
@@ -123,7 +123,7 @@ if "%CLEAN_BUILD%"=="true" (
     echo.
 )
 
-REM ƒrƒ‹ƒhƒfƒBƒŒƒNƒgƒŠì¬
+REM ï¿½rï¿½ï¿½ï¿½hï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ì¬
 if not exist %BUILD_DIR% (
     echo ? Creating build directory...
     mkdir %BUILD_DIR%
@@ -139,7 +139,7 @@ if not exist %BUILD_DIR% (
 cd %BUILD_DIR%
 
 REM ========================================
-REM CMakeƒvƒƒWƒFƒNƒg¶¬
+REM CMakeï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½
 REM ========================================
 
 echo ? Generating project files with CMake...
@@ -153,7 +153,7 @@ cmake .. ^
     -A %ARCHITECTURE% ^
     -DCMAKE_BUILD_TYPE=Debug ^
     -DBUILD_SHARED_LIBS=OFF ^
-    -DBUILD_EDITOR=ON ^
+    -DBUILD_EDITOR=OFF ^
     -DBUILD_TOOLS=OFF ^
     -DBUILD_SAMPLES=OFF ^
     -DELK_ENABLE_LOGGING=ON ^
@@ -183,7 +183,7 @@ echo ? Project files generated successfully!
 echo.
 
 REM ========================================
-REM ¶¬Œ‹‰Ê‚ÌŠm”F
+REM ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚ÌŠmï¿½F
 REM ========================================
 
 echo ? Checking generated files...
@@ -196,7 +196,7 @@ if exist "%PROJECT_NAME%.sln" (
     goto error_exit
 )
 
-REM ƒvƒƒWƒFƒNƒgƒtƒ@ƒCƒ‹‚ÌŠm”F
+REM ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½gï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌŠmï¿½F
 set PROJECT_FOUND=false
 if exist "ElkEngine\ElkEngine.vcxproj" (
     echo ? ElkEngine project: ElkEngine\ElkEngine.vcxproj
@@ -218,7 +218,7 @@ if "%PROJECT_FOUND%"=="false" (
     goto error_exit
 )
 
-REM CMakeƒtƒ@ƒCƒ‹‚ÌŠm”F
+REM CMakeï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌŠmï¿½F
 if exist "CMakeCache.txt" (
     echo ? CMake cache: CMakeCache.txt
 )
@@ -226,7 +226,7 @@ if exist "CMakeCache.txt" (
 echo.
 
 REM ========================================
-REM Š®—¹ƒƒbƒZ[ƒW
+REM ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½bï¿½Zï¿½[ï¿½W
 REM ========================================
 
 echo =========================================
@@ -248,7 +248,7 @@ echo   build.bat open       - Open existing solution
 echo.
 echo =========================================
 
-REM Visual Studio‚ÅŠJ‚­iƒIƒvƒVƒ‡ƒ“j
+REM Visual Studioï¿½ÅŠJï¿½ï¿½ï¿½iï¿½Iï¿½vï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½j
 if "%OPEN_VS%"=="true" (
     goto open_solution
 ) else (
@@ -261,7 +261,7 @@ cd ..
 goto end
 
 REM ========================================
-REM Visual Studio ‚ÅŠJ‚­
+REM Visual Studio ï¿½ÅŠJï¿½ï¿½
 REM ========================================
 
 :open_solution
@@ -280,7 +280,7 @@ if exist "%PROJECT_NAME%.sln" (
     echo ? Visual Studio should open shortly
     echo.
     echo ? Tips for first-time setup:
-    echo   - Set Runtime as startup project (right-click ¨ Set as Startup Project)
+    echo   - Set Runtime as startup project (right-click ï¿½ï¿½ Set as Startup Project)
     echo   - Use Debug configuration for development
     echo   - Use Release configuration for final builds
     echo.
@@ -296,7 +296,7 @@ cd ..
 goto end
 
 REM ========================================
-REM ƒGƒ‰[I—¹
+REM ï¿½Gï¿½ï¿½ï¿½[ï¿½Iï¿½ï¿½
 REM ========================================
 
 :error_exit

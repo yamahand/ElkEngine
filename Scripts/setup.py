@@ -73,9 +73,11 @@ def create_template_files() -> Dict[str, str]:
     # Engine.h template
     templates["ElkEngine/Public/ElkEngine/Core/Engine.h"] = '''#pragma once
 
-#include "Application.h"
+#include "EngineAPI.h"
 
 namespace elk {
+
+class Application;
 
 class ENGINE_API Engine {
 public:
@@ -127,8 +129,14 @@ public:
 
 int main() {
     // Create engine
-    auto* engine = ElkEngine::CreateEngine();
+    auto* engine = elk::CreateEngine();
     if (!engine) {
+        return -1;
+    }
+
+    // Initialize engine
+    if (!engine->Initialize()) {
+        elk::DestroyEngine(engine);
         return -1;
     }
 
@@ -139,7 +147,7 @@ int main() {
     engine->Run(game.get());
 
     // Cleanup
-    ElkEngine::DestroyEngine(engine);
+    elk::DestroyEngine(engine);
     return 0;
 }
 '''
@@ -149,7 +157,7 @@ int main() {
 
 #include "ElkEngine/Core/Application.h"
 
-class GameApplication : public ElkEngine::Application {
+class GameApplication : public elk::Application {
 public:
     GameApplication() = default;
     ~GameApplication() override = default;

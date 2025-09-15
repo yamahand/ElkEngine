@@ -130,12 +130,30 @@ install(TARGETS ElkEngine
     INCLUDES DESTINATION include
 )
 
-# CMake設定ファイルインストール
-install(EXPORT ElkEngineTargets
-    FILE ElkEngineTargets.cmake
-    namespace elk::
-    DESTINATION lib/cmake/ElkEngine
-)
+# CMakeバージョンチェック後にエクスポート設定
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
+    # CMake設定ファイルインストール
+    install(EXPORT ElkEngineTargets
+        FILE ElkEngineTargets.cmake
+        NAMESPACE elk::
+        DESTINATION lib/cmake/ElkEngine
+    )
+    
+    # 簡易Config.cmakeファイル生成
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ElkEngineConfig.cmake"
+"include(\"\${CMAKE_CURRENT_LIST_DIR}/ElkEngineTargets.cmake\")
+set(ElkEngine_FOUND TRUE)
+")
+    
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/ElkEngineConfig.cmake"
+        DESTINATION lib/cmake/ElkEngine
+    )
+    
+    message(STATUS "Package export configured for CMAKE ${CMAKE_VERSION}")
+else()
+    message(WARNING "CMAKE ${CMAKE_VERSION} detected. Package export disabled (requires 3.15+)")
+endif()
 
 # ========================================
 # デバッグ情報表示
