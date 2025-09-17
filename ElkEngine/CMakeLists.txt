@@ -2,6 +2,17 @@
 
 message(STATUS "Configuring ElkEngine...")
 
+# --- 追加: 共通 cmake モジュールをロード ---
+set(ELK_CMAKE_DIR "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${ELK_CMAKE_DIR}")
+if(EXISTS "${ELK_CMAKE_DIR}/EngineUtils.cmake")
+    include("${ELK_CMAKE_DIR}/EngineUtils.cmake")
+    message(STATUS "Included EngineUtils.cmake from ${ELK_CMAKE_DIR}")
+else()
+    message(WARNING "EngineUtils.cmake not found in ${ELK_CMAKE_DIR}; continuing without it (fallbacks may be used).")
+endif()
+# --- ここまで追加 ---
+
 # ========================================
 # ソースファイル収集
 # ========================================
@@ -16,6 +27,10 @@ elk_add_source_directory(ENGINE_AUDIO_SOURCES "Private/Audio")
 elk_add_source_directory(ENGINE_INPUT_SOURCES "Private/Input")
 elk_add_source_directory(ENGINE_MATH_SOURCES "Private/Math")
 
+# --- 追加: ECS の Private ソースを収集 ---
+elk_add_source_directory(ENGINE_ECS_SOURCES "Private/ECS")
+# --- ここまで追加 ---
+
 # プラットフォーム固有ソース
 elk_add_platform_sources(ENGINE_PLATFORM_SOURCES "Private/Platforms")
 
@@ -28,6 +43,7 @@ set(ENGINE_ALL_SOURCES
     ${ENGINE_INPUT_SOURCES}
     ${ENGINE_MATH_SOURCES}
     ${ENGINE_PLATFORM_SOURCES}
+    ${ENGINE_ECS_SOURCES}  # <- 追加分を含める
 )
 
 # ========================================
