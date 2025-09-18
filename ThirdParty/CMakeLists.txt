@@ -15,6 +15,43 @@ option(ELK_USE_GLFW "Use GLFW for windowing" OFF)
 option(ELK_USE_GLM "Use GLM for mathematics" OFF)
 option(ELK_USE_STB "Use STB for image loading" OFF)
 option(ELK_USE_IMGUI "Use Dear ImGui for debugging UI" ON)
+option(ELK_USE_SPDLOG "Use spdlog for logging" ON)
+
+# Helper: ターゲットが ALIAS なら実体を取得してフォルダを設定する
+function(elk_set_folder_for_target tgt folder)
+    if(NOT TARGET ${tgt})
+        return()
+    endif()
+    
+    get_target_property(_type ${tgt} TYPE)
+    
+    if(_type STREQUAL "ALIAS")
+        get_target_property(_real ${tgt} ALIASED_TARGET)
+        if(_real AND TARGET ${_real})
+            get_target_property(_real_type ${_real} TYPE)
+            # 再帰的にALIASをたどる
+            if(_real_type STREQUAL "ALIAS")
+                elk_set_folder_for_target(${_real} ${folder})
+            else()
+                # IMPORTED ターゲットはスキップ
+                get_target_property(_real_imported ${_real} IMPORTED)
+                if(NOT _real_imported)
+                    set_target_properties(${_real} PROPERTIES FOLDER ${folder})
+                endif()
+            endif()
+        endif()
+        # ALIASターゲット自身には絶対にset_target_propertiesしない
+        return()
+    endif()
+    
+    # IMPORTED ターゲットはフォルダ設定をスキップ
+    get_target_property(_imported ${tgt} IMPORTED)
+    if(_imported)
+        return()
+    endif()
+    
+    set_target_properties(${tgt} PROPERTIES FOLDER ${folder})
+endfunction()
 
 # ========================================
 # GLFW（ウィンドウ管理）
@@ -159,6 +196,44 @@ if(ELK_USE_IMGUI AND ELK_FETCHCONTENT_AUTO)
 endif()
 
 # ========================================
+# spdlog (logging)
+# ========================================
+if(ELK_USE_SPDLOG)
+    # まずパッケージとして探す
+    find_package(spdlog CONFIG QUIET)
+
+    if(TARGET spdlog::spdlog)
+        message(STATUS "spdlog found as package")
+        # ThirdParty::spdlog インターフェースライブラリを作成
+        if(NOT TARGET ThirdParty::spdlog)
+            add_library(ThirdParty::spdlog INTERFACE IMPORTED)
+            target_link_libraries(ThirdParty::spdlog INTERFACE spdlog::spdlog)
+        endif()
+    elseif(ELK_FETCHCONTENT_AUTO)
+        message(STATUS "spdlog not found as package; fetching via FetchContent...")
+        FetchContent_Declare(
+            spdlog
+            GIT_REPOSITORY https://github.com/gabime/spdlog.git
+            GIT_TAG v1.11.0
+            GIT_SHALLOW TRUE
+        )
+        FetchContent_MakeAvailable(spdlog)
+        if(TARGET spdlog::spdlog)
+            # ThirdParty::spdlog インターフェースライブラリを作成
+            if(NOT TARGET ThirdParty::spdlog)
+                add_library(ThirdParty::spdlog INTERFACE IMPORTED)
+                target_link_libraries(ThirdParty::spdlog INTERFACE spdlog::spdlog)
+            endif()
+            message(STATUS "spdlog fetched successfully")
+        else()
+            message(WARNING "Failed to fetch spdlog via FetchContent")
+        endif()
+    else()
+        message(WARNING "ELK_USE_SPDLOG=ON but spdlog not found and FetchContent disabled")
+    endif()
+endif()
+
+# ========================================
 # 手動配置ライブラリ
 # ========================================
 
@@ -234,6 +309,7 @@ message(STATUS "GLFW:     ${ELK_USE_GLFW}")
 message(STATUS "GLM:      ${ELK_USE_GLM}")
 message(STATUS "STB:      ${ELK_USE_STB}")
 message(STATUS "ImGui:    ${ELK_USE_IMGUI}")
+message(STATUS "spdlog:   ${ELK_USE_SPDLOG}")
 
 if(TARGET ThirdParty::FMOD)
     message(STATUS "FMOD:     Found (manual)")

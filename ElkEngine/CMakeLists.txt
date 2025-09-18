@@ -26,6 +26,7 @@ elk_add_source_directory(ENGINE_RENDERER_SOURCES "Private/Renderer")
 elk_add_source_directory(ENGINE_AUDIO_SOURCES "Private/Audio")
 elk_add_source_directory(ENGINE_INPUT_SOURCES "Private/Input")
 elk_add_source_directory(ENGINE_MATH_SOURCES "Private/Math")
+elk_add_source_directory(ENGINE_LOGGER_SOURCES "Private/Core/Logger")
 
 # --- 追加: ECS の Private ソースを収集 ---
 elk_add_source_directory(ENGINE_ECS_SOURCES "Private/ECS")
@@ -43,7 +44,8 @@ set(ENGINE_ALL_SOURCES
     ${ENGINE_INPUT_SOURCES}
     ${ENGINE_MATH_SOURCES}
     ${ENGINE_PLATFORM_SOURCES}
-    ${ENGINE_ECS_SOURCES}  # <- 追加分を含める
+    ${ENGINE_ECS_SOURCES}
+    ${ENGINE_LOGGER_SOURCES}
 )
 
 # ========================================
@@ -105,6 +107,15 @@ endif()
 if(TARGET ThirdParty::STB)
     target_link_libraries(ElkEngine PRIVATE ThirdParty::STB)
     message(STATUS "Linked STB to ElkEngine")
+endif()
+
+# 外部ライブラリリンク: ThirdParty 側で ThirdParty::spdlog が作られていればリンクする
+if(TARGET ThirdParty::spdlog)
+    target_link_libraries(ElkEngine PUBLIC ThirdParty::spdlog)
+    target_compile_definitions(ElkEngine PUBLIC ELK_USE_SPDLOG=1)
+    message(STATUS "Linked spdlog (ThirdParty::spdlog) to ElkEngine")
+else()
+    message(STATUS "spdlog not available for linking")
 endif()
 
 # ========================================

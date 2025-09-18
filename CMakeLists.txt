@@ -2,6 +2,79 @@
 cmake_minimum_required(VERSION 4.0)
 project(ElkGameEngine LANGUAGES CXX)
 
+# --- 追加: 共通 cmake モジュールをロード（存在すれば include、なければフォールバック実装を追加） ---
+set(ELK_CMAKE_DIR "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${ELK_CMAKE_DIR}")
+
+if(EXISTS "${ELK_CMAKE_DIR}/EngineUtils.cmake")
+    include("${ELK_CMAKE_DIR}/EngineUtils.cmake")
+    message(STATUS "Included EngineUtils.cmake from ${ELK_CMAKE_DIR}")
+else()
+    message(WARNING "EngineUtils.cmake not found in ${ELK_CMAKE_DIR}; using internal fallbacks.")
+endif()
+
+# フォールバック: elk_* ヘルパーが未定義なら簡易実装を提供
+if(NOT COMMAND elk_add_source_directory_recursive)
+    function(elk_add_source_directory_recursive outVar dir)
+        file(GLOB_RECURSE _elk_tmp_files
+            RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.hh
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.cxx
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.cc
+        )
+        set(${outVar} ${_elk_tmp_files} PARENT_SCOPE)
+    endfunction()
+    message(STATUS "Registered fallback: elk_add_source_directory_recursive")
+endif()
+
+if(NOT COMMAND elk_add_source_directory)
+    function(elk_add_source_directory outVar dir)
+        file(GLOB _elk_tmp_files
+            RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.hh
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.cxx
+            ${CMAKE_CURRENT_SOURCE_DIR}/${dir}/*.cc
+        )
+        set(${outVar} ${_elk_tmp_files} PARENT_SCOPE)
+    endfunction()
+    message(STATUS "Registered fallback: elk_add_source_directory")
+endif()
+
+if(NOT COMMAND elk_add_platform_sources)
+    function(elk_add_platform_sources outVar dir)
+        elk_add_source_directory(${outVar} ${dir})
+    endfunction()
+    message(STATUS "Registered fallback: elk_add_platform_sources")
+endif()
+
+if(NOT COMMAND elk_setup_engine_source_groups)
+    function(elk_setup_engine_source_groups) # no-op fallback
+    endfunction()
+endif()
+if(NOT COMMAND elk_setup_library_properties)
+    function(elk_setup_library_properties target) # no-op fallback
+    endfunction()
+endif()
+if(NOT COMMAND elk_link_platform_libraries)
+    function(elk_link_platform_libraries target) # no-op fallback
+    endfunction()
+endif()
+if(NOT COMMAND elk_setup_compiler_warnings)
+    function(elk_setup_compiler_warnings target) # no-op fallback
+    endfunction()
+endif()
+if(NOT COMMAND elk_print_target_info)
+    function(elk_print_target_info target) # no-op fallback
+    endfunction()
+endif()
+# --- ここまで追加 ---
+
 # C++20設定
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,6 +104,7 @@ else()
 endif()
 
 # プロジェクト構成
+add_subdirectory(ThirdParty)
 add_subdirectory(ElkEngine)
 add_subdirectory(EditorBridge)
 add_subdirectory(Runtime)
