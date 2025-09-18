@@ -209,6 +209,8 @@ if(ELK_USE_SPDLOG)
             add_library(ThirdParty::spdlog INTERFACE IMPORTED)
             target_link_libraries(ThirdParty::spdlog INTERFACE spdlog::spdlog)
         endif()
+        # spdlogの実体ターゲットにフォルダを設定
+        elk_set_folder_for_target(spdlog "ThirdParty/spdlog")
     elseif(ELK_FETCHCONTENT_AUTO)
         message(STATUS "spdlog not found as package; fetching via FetchContent...")
         FetchContent_Declare(
@@ -224,6 +226,8 @@ if(ELK_USE_SPDLOG)
                 add_library(ThirdParty::spdlog INTERFACE IMPORTED)
                 target_link_libraries(ThirdParty::spdlog INTERFACE spdlog::spdlog)
             endif()
+            # spdlogの実体ターゲットにフォルダを設定
+            elk_set_folder_for_target(spdlog "ThirdParty/spdlog")
             message(STATUS "spdlog fetched successfully")
         else()
             message(WARNING "Failed to fetch spdlog via FetchContent")
