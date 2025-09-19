@@ -272,3 +272,7 @@ Assets/Raw/
 
 # Generated config files
 Config/Generated/
+
+# ElkEngine Core
+!ElkEngine/Private/Core/
+!ElkEngine/Public/ElkEngine/Core/
