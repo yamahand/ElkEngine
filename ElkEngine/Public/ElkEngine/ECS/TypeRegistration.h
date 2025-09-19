@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // 使い方例:
 // // ヘッダ/ソースで

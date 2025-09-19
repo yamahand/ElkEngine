@@ -81,6 +81,7 @@ target_compile_definitions(ElkEngine
     PUBLIC
         ELK_ENGINE_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
         ELK_ENGINE_VERSION_MINOR=${PROJECT_VERSION_MINOR}
+        ELK_ENGINE_VERSION_PATCH=${PROJECT_VERSION_PATCH}
         ELK_PLATFORM_${PLATFORM_NAME}
     PRIVATE
         $<$<CONFIG:Debug>:ELK_DEBUG>
@@ -110,10 +111,15 @@ if(TARGET ThirdParty::STB)
 endif()
 
 # 外部ライブラリリンク: ThirdParty 側で ThirdParty::spdlog が作られていればリンクする
-if(TARGET ThirdParty::spdlog)
-    target_link_libraries(ElkEngine PUBLIC ThirdParty::spdlog)
+message(STATUS "Checking for ThirdParty::spdlog target...")
+if(TARGET spdlog::spdlog)
+    target_link_libraries(ElkEngine PUBLIC spdlog::spdlog)
     target_compile_definitions(ElkEngine PUBLIC ELK_USE_SPDLOG=1)
-    message(STATUS "Linked spdlog (ThirdParty::spdlog) to ElkEngine")
+    message(STATUS "Linked spdlog::spdlog to ElkEngine")
+elseif(TARGET spdlog)
+    target_link_libraries(ElkEngine PUBLIC spdlog)
+    target_compile_definitions(ElkEngine PUBLIC ELK_USE_SPDLOG=1)
+    message(STATUS "Linked spdlog to ElkEngine")
 else()
     message(STATUS "spdlog not available for linking")
 endif()
@@ -136,50 +142,6 @@ if(MSVC)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/EnginePCH.h")
         elk_setup_precompiled_header(ElkEngine "Private/Core/EnginePCH.h")
     endif()
-endif()
-
-# ========================================
-# インストール設定
-# ========================================
-
-# ヘッダーファイルインストール
-install(DIRECTORY Public/
-    DESTINATION include
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
-)
-
-# ライブラリインストール
-install(TARGETS ElkEngine
-    EXPORT ElkEngineTargets
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-)
-
-# CMakeバージョンチェック後にエクスポート設定
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.15")
-    # CMake設定ファイルインストール
-    install(EXPORT ElkEngineTargets
-        FILE ElkEngineTargets.cmake
-        NAMESPACE elk::
-        DESTINATION lib/cmake/ElkEngine
-    )
-    
-    # 簡易Config.cmakeファイル生成
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ElkEngineConfig.cmake"
-"include(\"\${CMAKE_CURRENT_LIST_DIR}/ElkEngineTargets.cmake\")
-set(ElkEngine_FOUND TRUE)
-")
-    
-    install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/ElkEngineConfig.cmake"
-        DESTINATION lib/cmake/ElkEngine
-    )
-    
-    message(STATUS "Package export configured for CMAKE ${CMAKE_VERSION}")
-else()
-    message(WARNING "CMAKE ${CMAKE_VERSION} detected. Package export disabled (requires 3.15+)")
 endif()
 
 # ========================================
