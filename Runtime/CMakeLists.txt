@@ -15,6 +15,9 @@ if(MSVC)
         get_filename_component(_dir "${_rel}" PATH)
         if(_dir STREQUAL "")
             set(_dir "Source")
+        else()
+            # Runtime/ プレフィックスを追加して他のプロジェクトと統一
+            set(_dir "Runtime/${_dir}")
         endif()
         string(REPLACE "/" "\\" _group "${_dir}")
         source_group("${_group}" FILES "${_src}")
@@ -68,8 +71,8 @@ elk_setup_compiler_warnings(Runtime)
 # ========================================
 
 if(MSVC)
-    # ソースグループ設定
-    elk_setup_source_groups(Runtime)
+    # ソースグループ設定（削除または後に移動）
+    # elk_setup_source_groups(Runtime)
     
     # 作業ディレクトリ設定
     set_target_properties(Runtime PROPERTIES

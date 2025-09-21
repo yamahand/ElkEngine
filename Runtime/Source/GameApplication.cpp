@@ -1,8 +1,12 @@
-#include "GameApplication.h"
+﻿#include "GameApplication.h"
 #include <iostream>
+
+#include <ElkEngine/Core/Engine.h>
 
 bool GameApplication::Initialize() {
     std::cout << "Game initialized!" << std::endl;
+    auto engine = elk::CreateEngine();
+	engine->Initialize();
     return true;
 }
 

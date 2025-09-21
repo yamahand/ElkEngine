@@ -80,6 +80,8 @@ function(elk_setup_engine_source_groups)
         elk_setup_module_source_group("Audio")
         elk_setup_module_source_group("Input")
         elk_setup_module_source_group("Math")
+        elk_setup_module_source_group("Core/Logger")
+        elk_setup_module_source_group("ECS")
         
         # Platform specific
         if(PLATFORM_WINDOWS)

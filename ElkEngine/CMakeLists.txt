@@ -27,10 +27,7 @@ elk_add_source_directory(ENGINE_AUDIO_SOURCES "Private/Audio")
 elk_add_source_directory(ENGINE_INPUT_SOURCES "Private/Input")
 elk_add_source_directory(ENGINE_MATH_SOURCES "Private/Math")
 elk_add_source_directory(ENGINE_LOGGER_SOURCES "Private/Core/Logger")
-
-# --- 追加: ECS の Private ソースを収集 ---
 elk_add_source_directory(ENGINE_ECS_SOURCES "Private/ECS")
-# --- ここまで追加 ---
 
 # プラットフォーム固有ソース
 elk_add_platform_sources(ENGINE_PLATFORM_SOURCES "Private/Platforms")

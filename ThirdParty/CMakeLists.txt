@@ -105,7 +105,7 @@ if(ELK_USE_IMGUI)
     FetchContent_Declare(
         imgui
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG v1.89.9
+        GIT_TAG v1.92.3
         GIT_SHALLOW TRUE
     )
     
@@ -141,7 +141,7 @@ if(ELK_USE_SPDLOG)
         FetchContent_Declare(
             spdlog
             GIT_REPOSITORY https://github.com/gabime/spdlog.git
-            GIT_TAG v1.11.0
+            GIT_TAG v1.15.3
             GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(spdlog)

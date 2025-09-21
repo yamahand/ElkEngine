@@ -158,8 +158,7 @@ cmake .. ^
     -DBUILD_SAMPLES=OFF ^
     -DELK_ENABLE_LOGGING=ON ^
     -DELK_ENABLE_PROFILER=ON ^
-    -DELK_USE_SPDLOG=ON ^
-    -DELK_FETCHCONTENT_AUTO=ON
+    -DELK_USE_SPDLOG=ON
 
 if %errorlevel% neq 0 (
     echo.

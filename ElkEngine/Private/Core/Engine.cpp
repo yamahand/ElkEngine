@@ -1,4 +1,5 @@
 ﻿#include "ElkEngine/Core/Engine.h"
+#include "ElkEngine/Core/Logger/GameLogger.h"
 
 #include <chrono>
 #include <thread>
@@ -35,6 +36,9 @@ namespace elk
         s_instance = this;
         m_impl->lastTick = std::chrono::steady_clock::now();
         std::cout << "Engine initialized\n";
+        DefaultLogger::Initialize("logs/game.log");
+		int tmp = 42; // ダミー変数
+		GAME_LOG_DEBUG("Engine", "Engine logger initialized {0}", tmp);
         return true;
     }
 
