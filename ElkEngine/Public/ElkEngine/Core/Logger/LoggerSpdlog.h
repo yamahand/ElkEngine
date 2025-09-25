@@ -234,6 +234,90 @@ namespace elk {
 			if (multi_logger_) multi_logger_->critical("[{}] {}", system, message);
 		}
 
+		// ===== source_loc 対応（ファイル名・行数・関数名付き）=====
+		// 非テンプレート版
+		void LogTrace(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::trace, fmt::format("[{}] {}", system, message));
+			}
+		}
+		void LogDebug(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::debug, fmt::format("[{}] {}", system, message));
+			}
+		}
+		void LogInfo(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::info, fmt::format("[{}] {}", system, message));
+			}
+		}
+		void LogWarn(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::warn, fmt::format("[{}] {}", system, message));
+			}
+		}
+		void LogError(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::err, fmt::format("[{}] {}", system, message));
+			}
+		}
+		void LogCritical(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::critical, fmt::format("[{}] {}", system, message));
+			}
+		}
+
+		// テンプレート版（fmt フォーマット対応）
+		template<typename... Args>
+		void LogTrace(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::trace, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+			}
+		}
+		template<typename... Args>
+		void LogDebug(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::debug, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+			}
+		}
+		template<typename... Args>
+		void LogInfo(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::info, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+			}
+		}
+		template<typename... Args>
+		void LogWarn(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::warn, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+			}
+		}
+		template<typename... Args>
+		void LogError(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::err, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+			}
+		}
+		template<typename... Args>
+		void LogCritical(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+			if (multi_logger_) {
+				spdlog::source_loc loc{file, line, func};
+				multi_logger_->log(loc, spdlog::level::critical, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+			}
+		}
+		// ===== /source_loc 対応 =====
+
 		// インゲームUI用のインターフェース
 		void SetGameLogCallback(std::function<void(const GameWindowSink::LogEntry&)> callback) {
 			if (game_sink_) {
