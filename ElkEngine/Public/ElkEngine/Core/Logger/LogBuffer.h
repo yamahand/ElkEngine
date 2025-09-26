@@ -28,7 +28,7 @@ namespace elk::logger {
 	/// スレッドセーフ：すべての公開メソッドは m_mutex で保護される。
 	/// </summary>
 	class LogBuffer {
-		friend class ::elk::Logger;
+		//friend class ::elk::Logger;
 	public:
 		~LogBuffer();
 

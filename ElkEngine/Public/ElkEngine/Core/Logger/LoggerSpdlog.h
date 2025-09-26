@@ -11,6 +11,7 @@
 #include "spdlog/async.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/rotating_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 #ifdef _WIN32
 #include "spdlog/sinks/msvc_sink.h"  // Visual Studio出力ウィンドウ用
@@ -40,7 +41,7 @@ namespace elk {
 
 			LogEntry entry;
 			entry.level = msg.level;
-			entry.message = fmt::to_string(formatted);
+			//entry.message = fmt::to_string(formatted);
 			entry.timestamp = msg.time;
 
 			// バッファサイズ制限
@@ -132,6 +133,9 @@ namespace elk {
 #endif
 				sinks.push_back(vs_sink);
 #endif
+				auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+				console_sink->set_pattern("[%H:%M:%S] [%^%l%$] %v");
+				sinks.push_back(console_sink);
 
 				game_sink_ = std::make_shared<GameWindowSink>(1000);
 				game_sink_->set_pattern("[%H:%M:%S] [%L] %v");
@@ -159,7 +163,7 @@ namespace elk {
 				initialized_ = true;
 
 				// 初期化完了ログ（フォーマット済み呼び出しを使うので非テンプレート版を呼ぶ）
-				LogInfo("SpdLogSystem", "ログシステムが初期化されました");
+				//LogInfo("SpdLogSystem", "ログシステムが初期化されました");
 
 				return true;
 			}
@@ -171,149 +175,59 @@ namespace elk {
 			}
 		}
 
-		// 既存のテンプレート形式はそのまま維持（フォーマット付き呼び出し用）
+		// テンプレート版 (std::format_string 使用: SPDLOG_USE_STD_FORMAT 前提)
 		template<typename... Args>
-		void LogTrace(const std::string& system, const std::string& format, Args&&... args) {
+		void LogTrace(const char* file, int line, const char* func,
+			[[maybe_unused]] std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
 			if (multi_logger_) {
-				multi_logger_->trace("[{}] " + format, system, std::forward<Args>(args)...);
-			}
-		}
-
-		template<typename... Args>
-		void LogDebug(const std::string& system, const std::string& format, Args&&... args) {
-			if (multi_logger_) {
-				multi_logger_->debug("[{}] " + format, system, std::forward<Args>(args)...);
-			}
-		}
-
-		template<typename... Args>
-		void LogInfo(const std::string& system, const std::string& format, Args&&... args) {
-			if (multi_logger_) {
-				multi_logger_->info("[{}] " + format, system, std::forward<Args>(args)...);
-			}
-		}
-
-		template<typename... Args>
-		void LogWarn(const std::string& system, const std::string& format, Args&&... args) {
-			if (multi_logger_) {
-				multi_logger_->warn("[{}] " + format, system, std::forward<Args>(args)...);
-			}
-		}
-
-		template<typename... Args>
-		void LogError(const std::string& system, const std::string& format, Args&&... args) {
-			if (multi_logger_) {
-				multi_logger_->error("[{}] " + format, system, std::forward<Args>(args)...);
-			}
-		}
-
-		template<typename... Args>
-		void LogCritical(const std::string& system, const std::string& format, Args&&... args) {
-			if (multi_logger_) {
-				multi_logger_->critical("[{}] " + format, system, std::forward<Args>(args)...);
-			}
-		}
-
-		// non-template のシンプルな受け口（concept が要求するシグネチャを満たす）
-		void LogTrace(const std::string& system, const std::string& message) {
-			if (multi_logger_) multi_logger_->trace("[{}] {}", system, message);
-		}
-		void LogDebug(const std::string& system, const std::string& message) {
-			if (multi_logger_) multi_logger_->debug("[{}] {}", system, message);
-		}
-		void LogInfo(const std::string& system, const std::string& message) {
-			if (multi_logger_) multi_logger_->info("[{}] {}", system, message);
-		}
-		void LogWarn(const std::string& system, const std::string& message) {
-			if (multi_logger_) multi_logger_->warn("[{}] {}", system, message);
-		}
-		void LogError(const std::string& system, const std::string& message) {
-			if (multi_logger_) multi_logger_->error("[{}] {}", system, message);
-		}
-		void LogCritical(const std::string& system, const std::string& message) {
-			if (multi_logger_) multi_logger_->critical("[{}] {}", system, message);
-		}
-
-		// ===== source_loc 対応（ファイル名・行数・関数名付き）=====
-		// 非テンプレート版
-		void LogTrace(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
-			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::trace, fmt::format("[{}] {}", system, message));
-			}
-		}
-		void LogDebug(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
-			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::debug, fmt::format("[{}] {}", system, message));
-			}
-		}
-		void LogInfo(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
-			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::info, fmt::format("[{}] {}", system, message));
-			}
-		}
-		void LogWarn(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
-			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::warn, fmt::format("[{}] {}", system, message));
-			}
-		}
-		void LogError(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
-			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::err, fmt::format("[{}] {}", system, message));
-			}
-		}
-		void LogCritical(const char* file, int line, const char* func, const std::string& system, const std::string& message) {
-			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::critical, fmt::format("[{}] {}", system, message));
-			}
-		}
-
-		// テンプレート版（fmt フォーマット対応）
-		template<typename... Args>
-		void LogTrace(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
-			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::trace, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+				spdlog::source_loc loc{ file, line, func };
+				multi_logger_->log(loc, spdlog::level::trace, fmt, std::forward<Args>(args)...);
 			}
 		}
 		template<typename... Args>
-		void LogDebug(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+		void LogDebug(const char* file, int line, const char* func,
+			[[maybe_unused]] std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
 			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::debug, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+				spdlog::source_loc loc{ file, line, func };
+				multi_logger_->log(loc, spdlog::level::debug, fmt, std::forward<Args>(args)...);
 			}
 		}
 		template<typename... Args>
-		void LogInfo(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+		void LogInfo(const char* file, int line, const char* func,
+			[[maybe_unused]] std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
 			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::info, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+				spdlog::source_loc loc{ file, line, func };
+				multi_logger_->log(loc, spdlog::level::info, fmt, std::forward<Args>(args)...);
 			}
 		}
 		template<typename... Args>
-		void LogWarn(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+		void LogWarn(const char* file, int line, const char* func,
+			[[maybe_unused]] std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
 			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::warn, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+				spdlog::source_loc loc{ file, line, func };
+				multi_logger_->log(loc, spdlog::level::warn, fmt, std::forward<Args>(args)...);
 			}
 		}
 		template<typename... Args>
-		void LogError(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+		void LogError(const char* file, int line, const char* func,
+			[[maybe_unused]] std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
 			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::err, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+				spdlog::source_loc loc{ file, line, func };
+				multi_logger_->log(loc, spdlog::level::err, fmt, std::forward<Args>(args)...);
 			}
 		}
 		template<typename... Args>
-		void LogCritical(const char* file, int line, const char* func, const std::string& system, const std::string& format, Args&&... args) {
+		void LogCritical(const char* file, int line, const char* func,
+			[[maybe_unused]] std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
 			if (multi_logger_) {
-				spdlog::source_loc loc{file, line, func};
-				multi_logger_->log(loc, spdlog::level::critical, fmt::format("[{}] " + format, system, std::forward<Args>(args)...));
+				spdlog::source_loc loc{ file, line, func };
+				multi_logger_->log(loc, spdlog::level::critical, fmt, std::forward<Args>(args)...);
 			}
 		}
 		// ===== /source_loc 対応 =====

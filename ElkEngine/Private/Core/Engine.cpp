@@ -1,6 +1,7 @@
 ﻿#include "Core/Engine.h"
 #include "Core/Logger/Logger.h"
 #include "Core/Logger/TagRegistry.h"
+#include "Core/Logger/GameLogger.h"
 #include "Core/Utility/ServiceLocator.h"
 
 #include <chrono>
@@ -42,6 +43,12 @@ namespace elk
 		m_impl->lastTick = std::chrono::steady_clock::now();
 		std::cout << "Engine initialized\n";
 		InitializeServices();
+		DefaultLogger::Initialize("logs/engine.log");
+		::elk::DefaultLogger::Info("__FILE__", 1, "__func__", "system", "Info");
+		GAME_LOG_INFO("Engine", "GAME_LOG_INFO");
+		GAME_LOG_WARN("Engine", "GAME_LOG_WARN");
+		GAME_LOG_ERROR("Engine", "GAME_LOG_ERROR");
+		GAME_LOG_DEBUG("Engine", "GAME_LOG_DEBUG");
 		return true;
 	}
 
@@ -93,14 +100,14 @@ namespace elk
 	void Engine::InitializeServices()
 	{
 		ServiceLocator::Register<logger::TagRegistry>(std::make_shared<logger::TagRegistry>());
-		ServiceLocator::Register<Logger>(std::make_shared<Logger>());
+		//ServiceLocator::Register<Logger>(std::make_shared<Logger>());
 
 		ELK_LOG_INFO("Engine", "Services initialized");
 	}
 
 	void Engine::ShutdownServices()
 	{
-		ServiceLocator::Unregister<Logger>();
+		//ServiceLocator::Unregister<Logger>();
 	}
 
 	ENGINE_API Engine* CreateEngine()

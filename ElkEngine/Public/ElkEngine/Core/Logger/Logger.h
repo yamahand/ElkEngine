@@ -13,7 +13,7 @@ namespace elk::logger {
 }
 
 namespace elk {
-
+#if false
 	class Logger {
 	public:
 		Logger();
@@ -40,6 +40,7 @@ namespace elk {
 	private:
 		std::unique_ptr <elk::logger::LogBuffer> m_logBuffer;
 	};
+#endif
 
 	// 初期化/終了（実装側で LogWithMeta を使って出力する）
 	void InitLogger(const std::string& filename = "", LogLevel level = LogLevel::Info);
@@ -53,7 +54,7 @@ namespace elk {
 	// ファイル名・行番号はマクロ側で自動付与。
 #define ELK_LOG_WITH_META(file, line, level, tag, ...) \
     do { \
-        elk::ServiceLocator::Get<Logger>()->Log(file, line, tag, level, __VA_ARGS__);\
+        \
     } while(0)
 
 // レベル別の簡易カテゴリ指定マクロ

@@ -2,10 +2,10 @@
 #include <string>
 #include <mutex>
 #include <utility>
-#include <format>
 #include <type_traits>
 #include <functional>
 #include <string_view>
+#include <format> // SPDLOG_USE_STD_FORMAT 有効時は std::format 使用
 
 #ifdef ELK_USE_SPDLOG
 #include "LoggerSpdlog.h"
@@ -15,16 +15,7 @@
 
 namespace elk {
 
-template<typename T>
-concept LoggerBackend = requires(T t, const std::string& s, const std::string& m) {
-    { t.Initialize(std::declval<const std::string&>()) } -> std::convertible_to<bool>;
-    { t.LogInfo(s, m) } -> std::same_as<void>;
-    { t.LogWarn(s, m) } -> std::same_as<void>;
-    { t.LogError(s, m) } -> std::same_as<void>;
-    { t.LogDebug(s, m) } -> std::same_as<void>;
-};
-
-template<LoggerBackend Backend>
+template<typename Backend>
 class GameLogger {
 public:
     inline static Backend backend_;
@@ -39,7 +30,6 @@ public:
         return GetInstance().Initialize(path);
     }
 
-    // --- 追加: ファイル名短縮ヘルパとメッセージ構築 ---
 private:
     static constexpr const char* BaseName(const char* path) {
         const char* last = path;
@@ -50,49 +40,31 @@ private:
         return last;
     }
 
-    static std::string PrefixFileLine(const char* file, int line, std::string_view body) {
-        return std::format("[{}:{}] {}", BaseName(file), line, body);
-    }
-
 public:
-    // 既存 API (互換)
+    // そのまま backend に転送 (Args... が空でも OK)
     template<typename... Args>
-    static void Info(const std::string& system, std::format_string<Args...> fmtstr, Args&&... args) {
-        GetInstance().LogInfo(system, std::format(fmtstr, std::forward<Args>(args)...));
+    static void Info(const char* file, int line, const char* func,
+                     std::string_view system,
+                     std::format_string<Args...> fmt, Args&&... args) {
+        GetInstance().LogInfo(file, line, func, system, fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    static void Warn(const std::string& system, std::format_string<Args...> fmtstr, Args&&... args) {
-        GetInstance().LogWarn(system, std::format(fmtstr, std::forward<Args>(args)...));
+    static void Warn(const char* file, int line, const char* func,
+                     std::string_view system,
+                     std::format_string<Args...> fmt, Args&&... args) {
+        GetInstance().LogWarn(file, line, func, system, fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    static void Error(const std::string& system, std::format_string<Args...> fmtstr, Args&&... args) {
-        GetInstance().LogError(system, std::format(fmtstr, std::forward<Args>(args)...));
+    static void Error(const char* file, int line, const char* func,
+                      std::string_view system,
+                      std::format_string<Args...> fmt, Args&&... args) {
+        GetInstance().LogError(file, line, func, system, fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    static void Debug(const std::string& system, std::format_string<Args...> fmtstr, Args&&... args) {
-        GetInstance().LogDebug(system, std::format(fmtstr, std::forward<Args>(args)...));
-    }
-
-    // --- 追加: ファイル/行付きバージョン (マクロ用) ---
-    template<typename... Args>
-    static void InfoFL(const char* file, int line, const std::string& system, std::format_string<Args...> fmtstr, Args&&... args) {
-        auto body = std::format(fmtstr, std::forward<Args>(args)...);
-        GetInstance().LogInfo(system, PrefixFileLine(file, line, body));
-    }
-    template<typename... Args>
-    static void WarnFL(const char* file, int line, const std::string& system, std::format_string<Args...> fmtstr, Args&&... args) {
-        auto body = std::format(fmtstr, std::forward<Args>(args)...);
-        GetInstance().LogWarn(system, PrefixFileLine(file, line, body));
-    }
-    template<typename... Args>
-    static void ErrorFL(const char* file, int line, const std::string& system, std::format_string<Args...> fmtstr, Args&&... args) {
-        auto body = std::format(fmtstr, std::forward<Args>(args)...);
-        GetInstance().LogError(system, PrefixFileLine(file, line, body));
-    }
-    template<typename... Args>
-    static void DebugFL(const char* file, int line, const std::string& system, std::format_string<Args...> fmtstr, Args&&... args) {
-        auto body = std::format(fmtstr, std::forward<Args>(args)...);
-        GetInstance().LogDebug(system, PrefixFileLine(file, line, body));
+    static void Debug(const char* file, int line, const char* func,
+                      std::string_view system,
+                      std::format_string<Args...> fmt, Args&&... args) {
+        GetInstance().LogDebug(file, line, func, system, fmt, std::forward<Args>(args)...);
     }
 
     static void Flush() {
@@ -108,12 +80,11 @@ using DefaultBackend = SpdLogSystem;
 
 using DefaultLogger = GameLogger<DefaultBackend>;
 
-    // マクロ: __FILE__ / __LINE__ を自動付与
-#define GAME_LOG_INFO(system, ...)  ::elk::DefaultLogger::InfoFL(__FILE__, __LINE__, system, __VA_ARGS__)
-#define GAME_LOG_WARN(system, ...)  ::elk::DefaultLogger::WarnFL(__FILE__, __LINE__, system, __VA_ARGS__)
-#define GAME_LOG_ERROR(system, ...) ::elk::DefaultLogger::ErrorFL(__FILE__, __LINE__, system, __VA_ARGS__)
+#define GAME_LOG_INFO(system, ...)  ::elk::DefaultLogger::Info(__FILE__, __LINE__, __func__, system, __VA_ARGS__)
+#define GAME_LOG_WARN(system, ...)  ::elk::DefaultLogger::Warn(__FILE__, __LINE__, __func__, system, __VA_ARGS__)
+#define GAME_LOG_ERROR(system, ...) ::elk::DefaultLogger::Error(__FILE__, __LINE__, __func__, system, __VA_ARGS__)
 #ifdef _DEBUG
-#define GAME_LOG_DEBUG(system, ...) ::elk::DefaultLogger::DebugFL(__FILE__, __LINE__, system, __VA_ARGS__)
+#define GAME_LOG_DEBUG(system, ...) ::elk::DefaultLogger::Debug(__FILE__, __LINE__, __func__, system, __VA_ARGS__)
 #else
 #define GAME_LOG_DEBUG(system, ...) ((void)0)
 #endif

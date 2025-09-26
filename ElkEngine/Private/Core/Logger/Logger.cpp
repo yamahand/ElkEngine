@@ -81,6 +81,7 @@ namespace elk {
 		std::cerr << "[" << lvl << "] " << message << std::endl;
 	}
 
+#if 0
 	Logger::Logger() {
 		m_logBuffer = std::make_unique<elk::logger::LogBuffer>();
 		m_logBuffer->Initialize(100 * 1024 * 1024, 1000000); // 100MB, 1,000,000 messages
@@ -91,5 +92,6 @@ namespace elk {
 		m_logBuffer->Add(level, tag, message, 0);
 		LogRaw(level, std::format("{} ({}:{})", message, fileName, line));
 	}
+#endif
 
 } // namespace elk::core

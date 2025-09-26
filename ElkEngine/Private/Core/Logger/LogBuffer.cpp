@@ -69,8 +69,6 @@ namespace elk::logger {
 			m_head = 0;
 			m_swapRequested = true; // バッファが一周したことを通知
 		}
-
-		return logMsg;
 	}
 }
 
