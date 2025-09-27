@@ -7,6 +7,8 @@
 #include <deque>
 #include <functional>
 
+#include "Core/Logger/LogLevel.h"
+
 #include "spdlog/spdlog.h"
 
 namespace elk {
@@ -104,9 +106,38 @@ namespace elk {
 		}
 
 		// ログレベル動的変更
-		void SetLogLevel(spdlog::level::level_enum level) {
+		void SetLogLevel(LogLevel level) {
+			spdlog::level::level_enum logLevel = spdlog::level::level_enum::info;
+			// LogLevelをspdlog::level::level_enumに変換
+			switch (level) {
+			case LogLevel::Trace:
+				logLevel = spdlog::level::trace;
+				break;
+			case LogLevel::Debug:
+				logLevel = spdlog::level::debug;
+				break;
+			case LogLevel::Info:
+				logLevel = spdlog::level::info;
+				break;
+			case LogLevel::Warn:
+				logLevel = spdlog::level::warn;
+				break;
+			case LogLevel::Error:
+				logLevel = spdlog::level::err;
+				break;
+			case LogLevel::Critical:
+				logLevel = spdlog::level::critical;
+				break;
+			case LogLevel::Off:
+				logLevel = spdlog::level::off;
+				break;
+			default:
+				logLevel = spdlog::level::info;
+				break;
+			}
+
 			if (multi_logger_) {
-				multi_logger_->set_level(level);
+				multi_logger_->set_level(logLevel);
 			}
 		}
 	};

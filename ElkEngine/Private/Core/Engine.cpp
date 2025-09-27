@@ -44,10 +44,12 @@ namespace elk
 		std::cout << "Engine initialized\n";
 		InitializeServices();
 		// ロガーは InitializeServices() 内で登録・初期化済みなのでマクロ経由でログ出力
-		GAME_LOG_INFO("Engine", "GAME_LOG_INFO");
-		GAME_LOG_WARN("Engine", "GAME_LOG_WARN");
-		GAME_LOG_ERROR("Engine", "GAME_LOG_ERROR");
-		GAME_LOG_DEBUG("Engine", "GAME_LOG_DEBUG");
+		ELK_LOG_TRACE("Engine", "GAME_LOG_TRACE");
+		ELK_LOG_DEBUG("Engine", "GAME_LOG_DEBUG");
+		ELK_LOG_INFO("Engine", "GAME_LOG_INFO");
+		ELK_LOG_WARN("Engine", "GAME_LOG_WARN");
+		ELK_LOG_ERROR("Engine", "GAME_LOG_ERROR");
+		ELK_LOG_CRITICAL("Engine", "GAME_LOG_CRITICAL");
 		return true;
 	}
 
@@ -105,6 +107,7 @@ namespace elk
 		// 初期化とログ出力は ServiceLocator 経由で行う
 		if (auto logger = LOGGER_SERVICE()) {
 			logger->Initialize("logs/engine.log");
+			logger->SetLogLevel(LogLevel::Trace);
 		}
 	}
 
