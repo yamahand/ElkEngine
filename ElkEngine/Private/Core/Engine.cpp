@@ -1,7 +1,7 @@
 ﻿#include "Core/Engine.h"
 #include "Core/Logger/Logger.h"
 #include "Core/Logger/TagRegistry.h"
-#include "Core/Logger/GameLogger.h"
+#include "Core/Logger/LoggerService.h"
 #include "Core/Utility/ServiceLocator.h"
 
 #include <chrono>
@@ -43,8 +43,7 @@ namespace elk
 		m_impl->lastTick = std::chrono::steady_clock::now();
 		std::cout << "Engine initialized\n";
 		InitializeServices();
-		DefaultLogger::Initialize("logs/engine.log");
-		::elk::DefaultLogger::Info("__FILE__", 1, "__func__", "system", "Info");
+		// ロガーは InitializeServices() 内で登録・初期化済みなのでマクロ経由でログ出力
 		GAME_LOG_INFO("Engine", "GAME_LOG_INFO");
 		GAME_LOG_WARN("Engine", "GAME_LOG_WARN");
 		GAME_LOG_ERROR("Engine", "GAME_LOG_ERROR");
@@ -100,9 +99,13 @@ namespace elk
 	void Engine::InitializeServices()
 	{
 		ServiceLocator::Register<logger::TagRegistry>(std::make_shared<logger::TagRegistry>());
-		//ServiceLocator::Register<Logger>(std::make_shared<Logger>());
+		// LoggerService を登録 (バックエンドが有効なときのみ)
+		ServiceLocator::Register<DefaultLoggerService>(std::make_shared<DefaultLoggerService>());
 
-		ELK_LOG_INFO("Engine", "Services initialized");
+		// 初期化とログ出力は ServiceLocator 経由で行う
+		if (auto logger = LOGGER_SERVICE()) {
+			logger->Initialize("logs/engine.log");
+		}
 	}
 
 	void Engine::ShutdownServices()

@@ -42,10 +42,6 @@ namespace elk {
 	};
 #endif
 
-	// 初期化/終了（実装側で LogWithMeta を使って出力する）
-	void InitLogger(const std::string& filename = "", LogLevel level = LogLevel::Info);
-	void ShutdownLogger();
-
 	// 低レベルアクセス（テスト/拡張用）
 	// 既存の LogRaw は互換のため残す（シンプルなメッセージ出力）
 	void LogRaw(LogLevel level, const std::string& message);
