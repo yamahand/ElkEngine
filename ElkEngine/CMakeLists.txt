@@ -139,6 +139,13 @@ if(MSVC)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Private/Core/EnginePCH.h")
         elk_setup_precompiled_header(ElkEngine "Private/Core/EnginePCH.h")
     endif()
+    
+    # MSVC のプリプロセッサ拡張を有効化 (/Zc:preprocessor)
+    # これは __VA_OPT__ を使うソースで必要となる
+    # ジェネレータ式でコンパイラ種別と構成をガードしてターゲットに付与する
+    target_compile_options(ElkEngine PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/Zc:preprocessor>
+    )
 endif()
 
 # ========================================
