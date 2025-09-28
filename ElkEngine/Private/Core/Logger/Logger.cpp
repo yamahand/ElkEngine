@@ -22,17 +22,18 @@ namespace elk {
 		std::cerr << "[" << lvl << "] " << message << std::endl;
 	}
 
-#if 0
-	Logger::Logger() {
+	bool Logger::Initialize(const std::string_view& log_file_path) {
 		m_logBuffer = std::make_unique<elk::logger::LogBuffer>();
 		m_logBuffer->Initialize(100 * 1024 * 1024, 1000000); // 100MB, 1,000,000 messages
+
+		return true;
 	}
 
-	void Logger::LogImpl(const char* fileName, int line, const std::string& tag, LogLevel level, const std::string& message)
+	void Logger::LogImpl(const char* fileName, int line, const char* func, std::string_view system, LogLevel level, const std::string& message)
 	{
-		m_logBuffer->Add(level, tag, message, 0);
+		(void*)func; // 未使用
+		m_logBuffer->Add(level, system, message, 0);
 		LogRaw(level, std::format("{} ({}:{})", message, fileName, line));
 	}
-#endif
 
 } // namespace elk::core

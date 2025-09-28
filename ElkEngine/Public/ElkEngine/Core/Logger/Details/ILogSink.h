@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 namespace elk::logger {
-    class LogMessage;
+    struct LogMessage;
     
     class ILogSink{
         public:

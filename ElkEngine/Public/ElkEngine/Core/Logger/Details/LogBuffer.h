@@ -8,6 +8,10 @@
 #include "Core/Logger/LogLevel.h"
 #include "Core/Logger/TagRegistry.h"
 
+namespace elk {
+	class Logger;
+}
+
 
 namespace elk::logger {
 	/// <summary>
@@ -28,8 +32,8 @@ namespace elk::logger {
 	/// スレッドセーフ：すべての公開メソッドは m_mutex で保護される。
 	/// </summary>
 	class LogBuffer {
-		//friend class ::elk::Logger;
 	public:
+		LogBuffer();
 		~LogBuffer();
 
 		/// <summary>
@@ -44,7 +48,7 @@ namespace elk::logger {
 		/// バッファが一周した場合は m_swapRequested が true になります。
 		/// スレッドセーフです（内部でロック）。
 		/// </summary>
-		void Add(LogLevel level, const std::string& tag, const std::string& message, uint64_t frameNumber);
+		void Add(LogLevel level, const std::string_view& tag, const std::string_view& message, uint64_t frameNumber);
 
 		// スワップ要求の有無を返す（ロック済みの読み取り）
 		bool NeedsSwap() {
@@ -71,8 +75,6 @@ namespace elk::logger {
 			}
 			return m_logMessages[i];
 		}
-	private:
-		LogBuffer();
 
 	private:
 		// メッセージ本文を格納するリングバッファ（null 終端付きで連続配置）

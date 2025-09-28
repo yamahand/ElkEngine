@@ -108,6 +108,8 @@ namespace elk
 		if (auto logger = LOGGER_SERVICE()) {
 			logger->Initialize("logs/engine.log");
 			logger->SetLogLevel(LogLevel::Trace);
+
+			func();
 		}
 	}
 

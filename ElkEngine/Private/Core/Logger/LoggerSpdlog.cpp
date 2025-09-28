@@ -88,7 +88,7 @@ namespace elk
 
 
 
-    bool SpdLogSystem::Initialize(const std::string &log_file_path)
+    bool SpdLogSystem::Initialize(const std::string_view& log_file_path)
     {
         try
         {
@@ -99,7 +99,7 @@ namespace elk
             std::vector<spdlog::sink_ptr> sinks;
 
             auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                log_file_path,
+                log_file_path.data(),
                 1024 * 1024 * 10, // 10MB
                 5                 // 最大5ファイル
             );

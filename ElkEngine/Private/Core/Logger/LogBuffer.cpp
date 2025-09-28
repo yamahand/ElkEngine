@@ -1,4 +1,4 @@
-﻿#include "Core/Logger/LogBuffer.h"
+﻿#include "Core/Logger/Details/LogBuffer.h"
 
 #include "Core/Utility/ServiceLocator.h"
 
@@ -21,7 +21,7 @@ namespace elk::logger {
 		m_swapRequested = false;
 	}
 
-	void LogBuffer::Add(LogLevel level, const std::string& tag, const std::string& message, uint64_t frameNumber)
+	void LogBuffer::Add(LogLevel level, const std::string_view& tag, const std::string_view& message, uint64_t frameNumber)
 	{
 		std::lock_guard lk(m_mutex);
 		// タグ登録

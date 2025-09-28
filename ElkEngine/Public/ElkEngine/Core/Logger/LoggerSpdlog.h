@@ -33,7 +33,7 @@ namespace elk {
 			}
 		}
 
-		bool Initialize(const std::string& log_file_path = "game.log");
+		bool Initialize(const std::string_view& log_file_path = "game.log");
 
 		template<typename... Args>
 		void LogTrace(const char* file, int line, const char* func,

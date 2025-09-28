@@ -3,7 +3,7 @@
 namespace elk
 {
     // ログレベル
-    enum class LogLevel
+    enum class LogLevel : int32_t
     {
         Trace,      // 関数の入出力、ループの各イテレーション
 		Debug,      // 詳細な情報、変数の中身など
