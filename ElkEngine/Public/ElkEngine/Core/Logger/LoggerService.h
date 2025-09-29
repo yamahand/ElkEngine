@@ -6,6 +6,8 @@
 #include <functional>
 #include <string_view>
 #include <format>
+#include <concepts>
+#include <typeinfo>
 
 #include "Core/Logger/LogLevel.h"
 
@@ -106,13 +108,13 @@ namespace elk {
 	// ServiceLocator を使ってアクセスするためのヘルパーマクロ
 #define LOGGER_SERVICE() (::elk::ServiceLocator::Get<::elk::DefaultLoggerService>())
 
-#define ELK_LOG_TRACE(system, ...) do { if (auto s = LOGGER_SERVICE()) s->LogTrace(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
-#define ELK_LOG_INFO(system, ...)  do { if (auto s = LOGGER_SERVICE()) s->LogInfo(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
-#define ELK_LOG_WARN(system, ...)  do { if (auto s = LOGGER_SERVICE()) s->LogWarn(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
-#define ELK_LOG_ERROR(system, ...) do { if (auto s = LOGGER_SERVICE()) s->LogError(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
-#define ELK_LOG_CRITICAL(system, ...) do { if (auto s = LOGGER_SERVICE()) s->LogCritical(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
+#define OLD_ELK_LOG_TRACE(system, ...) do { if (auto s = LOGGER_SERVICE()) s->LogTrace(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
+#define OLD_ELK_LOG_INFO(system, ...)  do { if (auto s = LOGGER_SERVICE()) s->LogInfo(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
+#define OLD_ELK_LOG_WARN(system, ...)  do { if (auto s = LOGGER_SERVICE()) s->LogWarn(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
+#define OLD_ELK_LOG_ERROR(system, ...) do { if (auto s = LOGGER_SERVICE()) s->LogError(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
+#define OLD_ELK_LOG_CRITICAL(system, ...) do { if (auto s = LOGGER_SERVICE()) s->LogCritical(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
 #ifdef _DEBUG
-#define ELK_LOG_DEBUG(system, ...) do { if (auto s = LOGGER_SERVICE()) s->LogDebug(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
+#define OLD_ELK_LOG_DEBUG(system, ...) do { if (auto s = LOGGER_SERVICE()) s->LogDebug(__FILE__, __LINE__, __func__, system, __VA_ARGS__); } while(0)
 #else
 #define ELK_LOG_DEBUG(system, ...) ((void)0)
 #endif
@@ -180,9 +182,37 @@ namespace elk::detail {
 	}
 
 	template<class T>
+	concept ElkFormattable = requires(const T & t) {
+		{ std::format("{}", t) } -> std::convertible_to<std::string>;
+	};
+
+	template<class T>
 	inline std::string ToStringOne(T&& v) {
-		// formattable でない型に対してはコンパイルエラーを出したくなければ if constexpr + コンセプトを拡張
-		return std::format("{}", std::forward<T>(v));
+		using U = std::remove_cvref_t<T>;
+
+		if constexpr (ElkFormattable<U>) {
+			return std::format("{}", std::forward<T>(v));
+		}
+		else if constexpr (std::is_enum_v<U>) {
+			using UT = std::underlying_type_t<U>;
+			return std::format("[unformattable enum {}={}]", typeid(U).name(), static_cast<UT>(v));
+		}
+		else if constexpr (std::is_array_v<U> && std::is_same_v<std::remove_extent_t<U>, char>) {
+			// char 配列 (文字列リテラル等)
+			return std::string(v);
+		}
+		else if constexpr (std::is_same_v<U, bool>) {
+			return v ? "true" : "false";
+		}
+		else if constexpr (std::is_arithmetic_v<U>) {
+			return std::format("{}", v); // 算術型（ここは実際 formattable のはずだが統一）
+		}
+		else if constexpr (std::is_pointer_v<U>) {
+			return std::format("[unformattable ptr {:p}]", static_cast<const void*>(v));
+		}
+		else {
+			return std::string("[unformattable ") + typeid(U).name() + "]";
+		}
 	}
 
 	template<typename... Args>
@@ -251,11 +281,42 @@ namespace elk::detail {
 	}
 } // namespace elk::detail
 
-// LOG_ マクロ: 既定で Info レベル + system="User" (必要なら引数拡張)
-#define LOG_(fmt, ...) \
+
+// 各LogLevel用 ELK_LOG_* マクロ
+#define ELK_LOG_TRACE(system, fmt, ...) \
+	do { \
+		::elk::detail::LogWithNames(::elk::LogLevel::Trace, \
+			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
+	} while(0)
+
+#define ELK_LOG_DEBUG(system, fmt, ...) \
+	do { \
+		::elk::detail::LogWithNames(::elk::LogLevel::Debug, \
+			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
+	} while(0)
+
+#define ELK_LOG_INFO(system, fmt, ...) \
 	do { \
 		::elk::detail::LogWithNames(::elk::LogLevel::Info, \
-			__FILE__, __LINE__, __func__, "User", fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
+			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
+	} while(0)
+
+#define ELK_LOG_WARN(system, fmt, ...) \
+	do { \
+		::elk::detail::LogWithNames(::elk::LogLevel::Warn, \
+			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
+	} while(0)
+
+#define ELK_LOG_ERROR(system, fmt, ...) \
+	do { \
+		::elk::detail::LogWithNames(::elk::LogLevel::Error, \
+			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
+	} while(0)
+
+#define ELK_LOG_CRITICAL(system, fmt, ...) \
+	do { \
+		::elk::detail::LogWithNames(::elk::LogLevel::Critical, \
+			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
 	} while(0)
 
 // ---- ここまで追加 ----
@@ -265,7 +326,7 @@ void func() {
 	int a = 42;
 	int b = 100;
 	//LOG_("value: {}", a);
-	LOG_("value: {1}, {2}, {3}, {0}", a, b, a + 1, "abc");
+	ELK_LOG_INFO("test", "value: {1}, {2}, {3}, {0}", a, b, a + 1, "abc");
 }
 // 出力例:
 // value: 42 [a=42]
