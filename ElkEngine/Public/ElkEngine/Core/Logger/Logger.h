@@ -3,47 +3,97 @@
 #include <string>
 #include <memory>
 #include <sstream>
+#include <format>
+
+#include "Core/Logger/LogLevel.h"
+#include "Core/Logger/Details/LogBuffer.h"
+#include "Core/Logger/Details/ILogSink.h"
+
+namespace elk::logger {
+	class LogBuffer;
+}
 
 namespace elk {
+	class Logger {
+	public:
+		Logger() = default;
+		~Logger() = default;
 
-    // ログレベル
-    enum class LogLevel { Trace, Debug, Info, Warn, Error, Critical, Off };
+	public:
+		bool Initialize(const std::string_view& log_file_path = "game.log");
 
-    // ログ用メタデータ（カテゴリ/サブカテゴリは文字列で自由に設定可能）
-    struct LogMeta {
-        LogLevel level;
-        std::string category;     // 例: "Engine", "Editor", "Game"
-        std::string subcategory;  // 例: "Memory", "Collision"（空文字列許容）
-        const char* file;         // __FILE__
-        int line;                 // __LINE__
-    };
+		template<typename... Args>
+		void LogTrace(const char* file, int line, const char* func,
+			std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
+			LogImple(file, line, func, system, LogLevel::Trace, fmt, std::forward<Args>(args)...);
+		}
+		template<typename... Args>
+		void LogDebug(const char* file, int line, const char* func,
+			std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
+			LogImple(file, line, func, system, LogLevel::Debug, fmt, std::forward<Args>(args)...);
+		}
+		template<typename... Args>
+		void LogInfo(const char* file, int line, const char* func,
+			std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
+			LogImple(file, line, func, system, LogLevel::Info, fmt, std::forward<Args>(args)...);
+		}
+		template<typename... Args>
+		void LogWarn(const char* file, int line, const char* func,
+			std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
+			LogImple(file, line, func, system, LogLevel::Warn, fmt, std::forward<Args>(args)...);
+		}
+		template<typename... Args>
+		void LogError(const char* file, int line, const char* func,
+			std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
+			LogImple(file, line, func, system, LogLevel::Error, fmt, std::forward<Args>(args)...);
+		}
+		template<typename... Args>
+		void LogCritical(const char* file, int line, const char* func,
+			std::string_view system,
+			std::format_string<Args...> fmt, Args&&... args) {
+			LogImple(file, line, func, system, LogLevel::Critical, fmt, std::forward<Args>(args)...);
+		}
+		
+		void ClearGameLogs() {}
 
-    // 初期化/終了（実装側で LogWithMeta を使って出力する）
-    void InitLogger(const std::string& filename = "", LogLevel level = LogLevel::Info);
-    void ShutdownLogger();
+		// 手動フラッシュ（重要なログの場合）
+		void Flush() {}
 
-    // 低レベルアクセス（テスト/拡張用）
-    // 既存の LogRaw は互換のため残す（シンプルなメッセージ出力）
-    void LogRaw(LogLevel level, const std::string& message);
+		// ログレベル動的変更
+		void SetLogLevel(LogLevel level) {
+			m_logLevel.store(level);
+		}
 
-    // 新しい構造化ログ受け口：メタ情報とメッセージを渡す
-    void LogWithMeta(const LogMeta& meta, const std::string& message);
+	private:
+		template<typename... Args>
+		void LogImple(const char* file, int line, const char* func,
+			std::string_view system,
+			LogLevel level,
+			std::format_string<Args...> fmt, Args&&... args) {
 
+			if (!IsLogLevelEnabled(level)) {
+				return;
+			}
 
-// 新しいマクロ：カテゴリ／サブカテゴリを文字列で指定して LogWithMeta を呼ぶ。
-// ファイル名・行番号はマクロ側で自動付与。
-#define ELK_LOG_WITH_META(level, category_str, subcategory_str, ...) \
-    do { \
-        elk::LogMeta _meta{ level, std::string(category_str), std::string(subcategory_str), __FILE__, __LINE__ }; \
-        elk::LogWithMeta(_meta, (std::ostringstream() << __VA_ARGS__).str()); \
-    } while(0)
+			std::string message = std::format(fmt, args...);
+			LogImpl(file, line, func, system, level, message);
+		}
 
-// レベル別の簡易カテゴリ指定マクロ
-#define ELK_LOG_INFO(category, subcategory, ...)  ELK_LOG_WITH_META(elk::LogLevel::Info,    category, subcategory, __VA_ARGS__)
-#define ELK_LOG_WARN(category, subcategory, ...)  ELK_LOG_WITH_META(elk::LogLevel::Warn,    category, subcategory, __VA_ARGS__)
-#define ELK_LOG_ERROR(category, subcategory, ...) ELK_LOG_WITH_META(elk::LogLevel::Error,   category, subcategory, __VA_ARGS__)
-#define ELK_LOG_DEBUG(category, subcategory, ...) ELK_LOG_WITH_META(elk::LogLevel::Debug,   category, subcategory, __VA_ARGS__)
-#define ELK_LOG_TRACE(category, subcategory, ...) ELK_LOG_WITH_META(elk::LogLevel::Trace,   category, subcategory, __VA_ARGS__)
-#define ELK_LOG_CRIT(category, subcategory, ...)  ELK_LOG_WITH_META(elk::LogLevel::Critical,category, subcategory, __VA_ARGS__)
+		void LogImpl(const char* fileName, int line, const char* func, std::string_view system, LogLevel level, const std::string& message);
+
+		bool IsLogLevelEnabled(LogLevel level) const {
+			return level >= m_logLevel.load(std::memory_order_relaxed);
+		}
+
+	private:
+		std::unique_ptr <elk::logger::LogBuffer> m_logBuffer;
+		std::vector<std::shared_ptr<logger::ILogSink>> m_sinks;
+		std::atomic<LogLevel> m_logLevel = LogLevel::Info;
+	};
 
 } // namespace elk

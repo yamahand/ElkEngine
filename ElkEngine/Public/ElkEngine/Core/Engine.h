@@ -16,6 +16,10 @@ public:
     static Engine* GetInstance() { return s_instance; }
 
 private:
+    void InitializeServices();
+    void ShutdownServices();
+
+private:
     static Engine* s_instance;
     struct EngineImpl* m_impl = nullptr;
 };

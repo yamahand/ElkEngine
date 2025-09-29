@@ -118,6 +118,7 @@ function(elk_setup_library_properties TARGET_NAME)
             $<INSTALL_INTERFACE:include>
         PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/Private
+            ${CMAKE_CURRENT_SOURCE_DIR}/Public/ElkEngine
     )
     
     # DLL設定
