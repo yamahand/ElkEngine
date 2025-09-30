@@ -2,6 +2,11 @@
 
 message(STATUS "Configuring ElkEngine...")
 
+# C++23設定
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # --- 追加: 共通 cmake モジュールをロード ---
 set(ELK_CMAKE_DIR "${CMAKE_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${ELK_CMAKE_DIR}")

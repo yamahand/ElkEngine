@@ -52,8 +52,8 @@ else()
     endfunction()
 endif()
 
-# C++20設定
-set(CMAKE_CXX_STANDARD 20)
+# C++23設定
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
