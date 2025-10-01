@@ -3,12 +3,14 @@
 #include "Core/Logger/TagRegistry.h"
 #include "Core/Logger/LoggerService.h"
 #include "Core/Utility/ServiceLocator.h"
+#include "Core/Memory/StdAllocatorAdapter.h"
 
 #include <chrono>
 #include <thread>
 #include <memory>
 #include <iostream>
 #include <atomic>
+#include <vector>
 
 namespace elk
 {
@@ -50,6 +52,12 @@ namespace elk
 		ELK_LOG_WARN("Engine", "GAME_LOG_WARN");
 		ELK_LOG_ERROR("Engine", "GAME_LOG_ERROR");
 		ELK_LOG_CRITICAL("Engine", "GAME_LOG_CRITICAL");
+
+        elk::memory::IAllocator* allocator = nullptr; // 実際には適切なアロケータを取得する
+        auto stdallocator = elk::memory::StdAllocatorAdapter<int>(allocator);
+        std::vector<int, elk::memory::StdAllocatorAdapter<int>> vec(stdallocator);
+        vec.push_back(42);
+        ELK_LOG_INFO("app", "Value in vector: {}", vec[0]);
 		return true;
 	}
 

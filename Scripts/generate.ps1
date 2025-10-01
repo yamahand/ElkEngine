@@ -22,20 +22,20 @@ $CLEAN_BUILD = $false
 $OPEN_VS = $false
 
 function Show-Help {
-    Write-Host "\nElkGameEngine Project Generation Script"
-    Write-Host "\nUsage: generate.ps1 [options]"
-    Write-Host "\nOptions:"
+    Write-Host "ElkGameEngine Project Generation Script"
+    Write-Host "Usage: generate.ps1 [options]"
+    Write-Host "Options:"
     Write-Host "  clean          Clean build directory before generating"
     Write-Host "  vs2019         Generate Visual Studio 2019 solution"
     Write-Host "  vs2022         Generate Visual Studio 2022 solution (default)"
     Write-Host "  open           Generate and open Visual Studio solution"
     Write-Host "  help           Show this help message"
-    Write-Host "\nExamples:"
+    Write-Host "Examples:"
     Write-Host "  .\generate.ps1                Generate VS2022 solution"
     Write-Host "  .\generate.ps1 clean vs2019   Clean and generate VS2019 solution"
     Write-Host "  .\generate.ps1 open           Generate and open VS2022 solution"
-    Write-Host "\nNote: This script only generates project files, does not build."
-    Write-Host "      Use build.ps1 to actually compile the project.\n"
+    Write-Host "Note: This script only generates project files, does not build."
+    Write-Host "      Use build.ps1 to actually compile the project."
 }
 
 foreach ($arg in $Arguments) {
@@ -54,7 +54,7 @@ foreach ($arg in $Arguments) {
 $LAST_STEP = ""
 $LAST_ERR = ""
 
-Write-Host "\n========================================="
+Write-Host "========================================="
 Write-Host " $PROJECT_NAME Project Generation"
 Write-Host "========================================="
 Write-Host " Generator: $GENERATOR"
@@ -66,8 +66,8 @@ Write-Host ""
 # CMakeバージョン確認
 if (-not (Get-Command cmake -ErrorAction SilentlyContinue)) {
     Write-Host "? CMake is not installed or not in PATH!"
-    Write-Host "\nPlease install CMake and make sure it's in your PATH."
-    Write-Host "Download from: https://cmake.org/download/\n"
+    Write-Host "Please install CMake and make sure it's in your PATH."
+    Write-Host "Download from: https://cmake.org/download/"
     $LAST_STEP = "CMakeNotFound"
     exit 1
 }
@@ -125,9 +125,9 @@ Push-Location $BUILD_DIR
 # ========================================
 # CMakeプロジェクト生成
 # ========================================
-Write-Host "? Generating project files with CMake...\n"
+Write-Host "? Generating project files with CMake..."
 Write-Host "Generator: $GENERATOR"
-Write-Host "Target Architecture: $ARCHITECTURE\n"
+Write-Host "Target Architecture: $ARCHITECTURE"
 
 $cmakeArgs = @(
     "..",
@@ -140,12 +140,12 @@ $cmakeArgs = @(
     "-DBUILD_SAMPLES=OFF",
     "-DELK_ENABLE_LOGGING=ON",
     "-DELK_ENABLE_PROFILER=ON",
-    "-DELK_USE_SPDLOG=ON"
+    "-DELK_USE_SPDLOG=OFF"
 )
 
 $cmakeResult = & cmake @cmakeArgs
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "\n? CMake project generation failed!\n"
+    Write-Host "? CMake project generation failed!"
     Write-Host "Common causes:"
     Write-Host " - CMake version too old (requires 3.20+)"
     Write-Host " - Visual Studio not properly installed"
@@ -161,12 +161,12 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-Write-Host "\n? Project files generated successfully!\n"
+Write-Host "? Project files generated successfully!"
 
 # ========================================
 # 生成結果の確認
 # ========================================
-Write-Host "? Checking generated files...\n"
+Write-Host "? Checking generated files..."
 
 if (Test-Path "$PROJECT_NAME.sln") {
     Write-Host "? Solution file: $PROJECT_NAME.sln"
@@ -233,11 +233,11 @@ if ($OPEN_VS) {
     }
     Write-Host "? Opening Visual Studio..."
     Start-Process "$PROJECT_NAME.sln"
-    Write-Host "\n? Visual Studio should open shortly\n"
+    Write-Host "? Visual Studio should open shortly"
     Write-Host "? Tips for first-time setup:"
     Write-Host "  - Set Runtime as startup project (right-click → Set as Startup Project)"
     Write-Host "  - Use Debug configuration for development"
-    Write-Host "  - Use Release configuration for final builds\n"
+    Write-Host "  - Use Release configuration for final builds"
 }
 
 Pop-Location

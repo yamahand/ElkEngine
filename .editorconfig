@@ -9,7 +9,7 @@ cpp_generate_documentation_comments = xml
 
 # Visual C++ の書式設定
 
-indent_style = tab
+indent_style = space
 indent_size = 4
 tab_width= 4
 cpp_indent_braces = false

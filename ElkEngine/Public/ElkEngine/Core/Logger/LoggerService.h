@@ -11,15 +11,10 @@
 
 #include "Core/Logger/LogLevel.h"
 
-#undef ELK_USE_SPDLOG
-#define ELK_USE_LOGGER
-
-#if  defined(ELK_USE_SPDLOG)
+#if defined(ELK_USE_SPDLOG)
 #include "LoggerSpdlog.h"
-#elif defined(ELK_USE_LOGGER)
-#include "Core/Logger/Logger.h"
 #else
-#error "対応するログバックエンドがありません。CMake で ELK_USE_SPDLOG を指定してください。"
+#include "Core/Logger/Logger.h"
 #endif
 
 namespace elk {
@@ -97,10 +92,8 @@ namespace elk {
 
 #if defined(ELK_USE_SPDLOG)
 	using DefaultBackend = SpdLogSystem;
-#elif defined(ELK_USE_LOGGER)
-	using DefaultBackend = Logger;
 #else
-#error "バックエンドが未指定です"
+	using DefaultBackend = Logger;
 #endif
 
 	using DefaultLoggerService = LoggerService<DefaultBackend>;
