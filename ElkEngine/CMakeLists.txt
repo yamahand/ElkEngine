@@ -27,11 +27,12 @@ elk_add_source_directory_recursive(ENGINE_PUBLIC_HEADERS "Public")
 
 # Private モジュール別ソース収集
 elk_add_source_directory(ENGINE_CORE_SOURCES "Private/Core")
+elk_add_source_directory(ENGINE_LOGGER_SOURCES "Private/Core/Logger")
+elk_add_source_directory(ENGINE_MEMORY_SOURCES "Private/Core/Memory")
 elk_add_source_directory(ENGINE_RENDERER_SOURCES "Private/Renderer")
 elk_add_source_directory(ENGINE_AUDIO_SOURCES "Private/Audio")
 elk_add_source_directory(ENGINE_INPUT_SOURCES "Private/Input")
 elk_add_source_directory(ENGINE_MATH_SOURCES "Private/Math")
-elk_add_source_directory(ENGINE_LOGGER_SOURCES "Private/Core/Logger")
 elk_add_source_directory(ENGINE_ECS_SOURCES "Private/ECS")
 
 # プラットフォーム固有ソース
@@ -48,6 +49,7 @@ set(ENGINE_ALL_SOURCES
     ${ENGINE_PLATFORM_SOURCES}
     ${ENGINE_ECS_SOURCES}
     ${ENGINE_LOGGER_SOURCES}
+    ${ENGINE_MEMORY_SOURCES}
 )
 
 # ========================================

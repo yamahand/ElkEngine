@@ -275,6 +275,8 @@ namespace elk::detail {
 } // namespace elk::detail
 
 
+#if defined(ELK_LOGGER_ENABLED)
+
 // 各LogLevel用 ELK_LOG_* マクロ
 #define ELK_LOG_TRACE(system, fmt, ...) \
 	do { \
@@ -312,16 +314,12 @@ namespace elk::detail {
 			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
 	} while(0)
 
-// ---- ここまで追加 ----
-
-// 例: 既存のテスト用関数
-void func() {
-	int a = 42;
-	int b = 100;
-	//LOG_("value: {}", a);
-	ELK_LOG_INFO("test", "value: {1}, {2}, {3}, {0}", a, b, a + 1, "abc");
-}
-// 出力例:
-// value: 42 [a=42]
-// value: 42, 100 [a=42, b=100]
-
+#else
+// ログ無効化時は何もしない
+#define ELK_LOG_TRACE(system, fmt, ...) ((void)0)
+#define ELK_LOG_DEBUG(system, fmt, ...) ((void)0)
+#define ELK_LOG_INFO(system, fmt, ...)  ((void)0)
+#define ELK_LOG_WARN(system, fmt, ...)  ((void)0)
+#define ELK_LOG_ERROR(system, fmt, ...) ((void)0)
+#define ELK_LOG_CRITICAL(system, fmt, ...) ((void)0)
+#endif

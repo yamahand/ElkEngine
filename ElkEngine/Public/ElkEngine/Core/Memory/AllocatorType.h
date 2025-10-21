@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
 namespace elk::memory {
-    
+
     enum class AllocatorType {
         Stack,       // スタックアロケータ（LIFO）
         Pool,        // プールアロケータ（固定サイズ）

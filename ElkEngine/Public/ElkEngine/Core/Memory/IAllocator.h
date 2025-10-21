@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+#include <bit>
 
 #include "Core/EngineAPI.h"
 #include "Core/Memory/AllocatorType.h"
@@ -196,8 +197,8 @@ namespace elk::memory {
         /**
          * @brief アライメントされているか確認
          */
-        static const bool IsAligned(const void* ptr, size_t alignment) noexcept {
-            return (reinterpret_cast<uintptr_t>(ptr) & (alignment - 1)) == 0;
+        static constexpr bool IsAligned(const void* ptr, size_t alignment) noexcept {
+            return (std::bit_cast<uintptr_t>(ptr) & (alignment - 1)) == 0;
         }
 
         /**
