@@ -109,7 +109,6 @@ namespace elk
 			logger->Initialize("logs/engine.log");
 			logger->SetLogLevel(LogLevel::Trace);
 
-			func();
 		}
 	}
 

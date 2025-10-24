@@ -121,9 +121,6 @@ namespace elk {
 
 } // namespace elk
 
-// 既存コードはそのまま … （ELK_LOG_* マクロ定義まで）
-
-// ---- ここから追加（LOG_ マクロ実装用ユーティリティ） ----
 #include <vector>
 #include <utility>
 #include <cctype>
@@ -319,16 +316,4 @@ namespace elk::detail {
 			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
 	} while(0)
 
-// ---- ここまで追加 ----
-
-// 例: 既存のテスト用関数
-void func() {
-	int a = 42;
-	int b = 100;
-	//LOG_("value: {}", a);
-	ELK_LOG_INFO("test", "value: {1}, {2}, {3}, {0}", a, b, a + 1, "abc");
-}
-// 出力例:
-// value: 42 [a=42]
-// value: 42, 100 [a=42, b=100]
 

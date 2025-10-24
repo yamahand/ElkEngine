@@ -4,6 +4,8 @@
 #include <memory>
 #include <sstream>
 #include <format>
+#include <vector>
+#include <mutex>
 
 #include "Core/Logger/LogLevel.h"
 #include "Core/Logger/Details/LogBuffer.h"
@@ -21,6 +23,9 @@ namespace elk {
 
 	public:
 		bool Initialize(const std::string_view& log_file_path = "game.log");
+
+		// Add a log sink that will receive LogMessage via ILogSink::Write
+		void AddSink(std::shared_ptr<logger::ILogSink> sink);
 
 		template<typename... Args>
 		void LogTrace(const char* file, int line, const char* func,
@@ -93,6 +98,7 @@ namespace elk {
 	private:
 		std::unique_ptr <elk::logger::LogBuffer> m_logBuffer;
 		std::vector<std::shared_ptr<logger::ILogSink>> m_sinks;
+		std::mutex m_sinksMutex;
 		std::atomic<LogLevel> m_logLevel = LogLevel::Info;
 	};
 
