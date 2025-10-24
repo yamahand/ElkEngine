@@ -233,7 +233,7 @@ if ($OPEN_VS) {
     }
     Write-Host "? Opening Visual Studio..."
     Start-Process "$PROJECT_NAME.slnx"
-    Write-Host "\n? Visual Studio should open shortly\n"
+    Write-Host "? Visual Studio should open shortly\n"
     Write-Host "? Tips for first-time setup:"
     Write-Host "  - Set Runtime as startup project (right-click → Set as Startup Project)"
     Write-Host "  - Use Debug configuration for development"
