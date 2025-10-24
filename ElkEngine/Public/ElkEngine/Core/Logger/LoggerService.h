@@ -114,9 +114,6 @@ namespace elk {
 
 } // namespace elk
 
-// 既存コードはそのまま … （ELK_LOG_* マクロ定義まで）
-
-// ---- ここから追加（LOG_ マクロ実装用ユーティリティ） ----
 #include <vector>
 #include <utility>
 #include <cctype>

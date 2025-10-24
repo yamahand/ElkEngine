@@ -11,7 +11,7 @@ param(
 # ========================================
 $PROJECT_NAME = "ElkGameEngine"
 $BUILD_DIR = "build"
-$DEFAULT_GENERATOR = "Visual Studio 17 2022"
+$DEFAULT_GENERATOR = "Visual Studio 18 2026"
 $ARCHITECTURE = "x64"
 
 # ========================================
@@ -168,8 +168,8 @@ Write-Host "? Project files generated successfully!"
 # ========================================
 Write-Host "? Checking generated files..."
 
-if (Test-Path "$PROJECT_NAME.sln") {
-    Write-Host "? Solution file: $PROJECT_NAME.sln"
+if (Test-Path "$PROJECT_NAME.slnx") {
+    Write-Host "? Solution file: $PROJECT_NAME.slnx"
 } else {
     Write-Host "? Solution file not found!"
     $LAST_STEP = "SolutionMissing"
@@ -210,10 +210,10 @@ Write-Host " Project Generation Complete! "
 Write-Host "========================================="
 Write-Host ""
 Write-Host "? Generated files location: $BUILD_DIR\"
-Write-Host "? Solution file: $PROJECT_NAME.sln"
+Write-Host "? Solution file: $PROJECT_NAME.slnx"
 Write-Host ""
 Write-Host "? Next steps:"
-Write-Host "  1. Open $PROJECT_NAME.sln in Visual Studio"
+Write-Host "  1. Open $PROJECT_NAME.slnx in Visual Studio"
 Write-Host "  2. Set Runtime as startup project (if not already)"
 Write-Host "  3. Build and run the project (F5)"
 Write-Host ""
@@ -226,14 +226,14 @@ Write-Host "========================================="
 
 # Visual Studioで開く（オプション）
 if ($OPEN_VS) {
-    if (-not (Test-Path "$PROJECT_NAME.sln")) {
+    if (-not (Test-Path "$PROJECT_NAME.slnx")) {
         Write-Host "? Solution file not found. Please run generation first."
         Pop-Location
         exit 1
     }
     Write-Host "? Opening Visual Studio..."
-    Start-Process "$PROJECT_NAME.sln"
-    Write-Host "? Visual Studio should open shortly"
+    Start-Process "$PROJECT_NAME.slnx"
+    Write-Host "\n? Visual Studio should open shortly\n"
     Write-Host "? Tips for first-time setup:"
     Write-Host "  - Set Runtime as startup project (right-click → Set as Startup Project)"
     Write-Host "  - Use Debug configuration for development"
