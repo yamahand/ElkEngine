@@ -9,9 +9,14 @@ cpp_generate_documentation_comments = xml
 
 # Visual C++ の書式設定
 
-indent_style = tab
+indent_style = space
 indent_size = 4
 tab_width= 4
+charset = utf-8-bom
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = off
+
 cpp_indent_braces = false
 cpp_indent_multi_line_relative_to = innermost_parenthesis
 cpp_indent_within_parentheses = indent
@@ -71,6 +76,7 @@ cpp_space_pointer_reference_alignment = left
 cpp_space_around_ternary_operator = insert
 cpp_use_unreal_engine_macro_formatting = true
 cpp_wrap_preserve_blocks = one_liners
+cpp_character_set = utf-8 with_bom
 
 # Visual C++ インクルード クリーンアップ設定
 

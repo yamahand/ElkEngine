@@ -11,15 +11,10 @@
 
 #include "Core/Logger/LogLevel.h"
 
-#undef ELK_USE_SPDLOG
-#define ELK_USE_LOGGER
-
-#if  defined(ELK_USE_SPDLOG)
+#if defined(ELK_USE_SPDLOG)
 #include "LoggerSpdlog.h"
-#elif defined(ELK_USE_LOGGER)
-#include "Core/Logger/Logger.h"
 #else
-#error "対応するログバックエンドがありません。CMake で ELK_USE_SPDLOG を指定してください。"
+#include "Core/Logger/Logger.h"
 #endif
 
 namespace elk {
@@ -97,10 +92,8 @@ namespace elk {
 
 #if defined(ELK_USE_SPDLOG)
 	using DefaultBackend = SpdLogSystem;
-#elif defined(ELK_USE_LOGGER)
-	using DefaultBackend = Logger;
 #else
-#error "バックエンドが未指定です"
+	using DefaultBackend = Logger;
 #endif
 
 	using DefaultLoggerService = LoggerService<DefaultBackend>;
@@ -279,6 +272,8 @@ namespace elk::detail {
 } // namespace elk::detail
 
 
+#if defined(ELK_LOGGER_ENABLED)
+
 // 各LogLevel用 ELK_LOG_* マクロ
 #define ELK_LOG_TRACE(system, fmt, ...) \
 	do { \
@@ -316,4 +311,12 @@ namespace elk::detail {
 			__FILE__, __LINE__, __func__, system, fmt, #__VA_ARGS__ __VA_OPT__(,) __VA_ARGS__); \
 	} while(0)
 
-
+#else
+// ログ無効化時は何もしない
+#define ELK_LOG_TRACE(system, fmt, ...) ((void)0)
+#define ELK_LOG_DEBUG(system, fmt, ...) ((void)0)
+#define ELK_LOG_INFO(system, fmt, ...)  ((void)0)
+#define ELK_LOG_WARN(system, fmt, ...)  ((void)0)
+#define ELK_LOG_ERROR(system, fmt, ...) ((void)0)
+#define ELK_LOG_CRITICAL(system, fmt, ...) ((void)0)
+#endif
