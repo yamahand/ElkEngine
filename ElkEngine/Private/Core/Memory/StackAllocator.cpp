@@ -1,6 +1,5 @@
 ﻿#include "Core/Memory/StackAllocator.h"
-#include "Core/Logger/Logger.h"
-#include "Core/Logger/LoggerService.h"
+#include "Core/Memory/MemoryLogger.h"
 
 namespace elk::memory
 {
@@ -13,9 +12,9 @@ namespace elk::memory
 		m_allocationCount(0),
 		m_casRetryCount(0)
 	{
-        if (!memory) {
-            ELK_LOG_ERROR("memory", "StackAllocator initialized with null memory pointer.");
-        }
+		if (!memory) {
+			MEMORY_LOG_ERROR(m_name.c_str(), "StackAllocator initialized with null memory pointer.");
+		}
 	}
 
 	memory::StackAllocator::~StackAllocator()
@@ -25,12 +24,12 @@ namespace elk::memory
 	void* StackAllocator::Allocate(size_t size, size_t alignment)
 	{
 		if (size == 0) {
-			ELK_LOG_WARN("memory", "[{}] Allocation size is zero.", m_name);
+			MEMORY_LOG_WARN(m_name.c_str(), "Allocation size is zero.");
 			return nullptr;
 		}
 
 		if (!IsPowerOfTwo(alignment)) {
-			ELK_LOG_ERROR("memory", "[{}] Alignment {} is not a power of two.", m_name, alignment);
+			MEMORY_LOG_ERROR_F(m_name.c_str(), "Alignment {} is not a power of two.", alignment);
 			return nullptr;
 		}
 
@@ -57,8 +56,8 @@ namespace elk::memory
 
 			// メモリ範囲チェック
 			if (newOffset > m_size) {
-				ELK_LOG_ERROR("memory", "[{}] Out of memory: requested {}, available {}",
-					m_name, newOffset - currentOffset, m_size - currentOffset);
+				MEMORY_LOG_ERROR_F(m_name.c_str(), "Out of memory: requested {}, available {}",
+					newOffset - currentOffset, m_size - currentOffset);
 				return nullptr;
 			}
 
@@ -109,7 +108,7 @@ namespace elk::memory
 
 		// 元のサイズは不明なので、派生クラスで実装することを推奨
 		// ここでは単純に新しいポインタを返す
-		ELK_LOG_WARN("memory", "[{}] Reallocate is inefficient for StackAllocator. Consider redesigning.", m_name);
+	MEMORY_LOG_WARN(m_name.c_str(), "Reallocate is inefficient for StackAllocator. Consider redesigning.");
 
 		return newPtr;
 	}
@@ -117,7 +116,7 @@ namespace elk::memory
 	void StackAllocator::Reset()
 	{
 		m_offset.store(0, std::memory_order_release);
-		ELK_LOG_INFO("memory", "[{}] Reset: All allocations cleared.", m_name);
+	MEMORY_LOG_INFO(m_name.c_str(), "Reset: All allocations cleared.");
 	}
 
 	size_t StackAllocator::GetMarker() const noexcept
@@ -128,13 +127,13 @@ namespace elk::memory
 	void StackAllocator::Rewind(size_t marker) noexcept
 	{
 		if (marker > m_size) {
-			ELK_LOG_ERROR("memory", "[{}] Invalid marker: {} exceeds size {}", m_name, marker, m_size);
+			MEMORY_LOG_ERROR_F(m_name.c_str(), "Invalid marker: {} exceeds size {}", marker, m_size);
 			return;
 		}
 
 		size_t currentOffset = m_offset.load(std::memory_order_acquire);
 		if (marker > currentOffset) {
-			ELK_LOG_WARN("memory", "[{}] Marker {} is ahead of current offset {}", m_name, marker, currentOffset);
+			MEMORY_LOG_WARN_F(m_name.c_str(), "Marker {} is ahead of current offset {}", marker, currentOffset);
 			return;
 		}
 
